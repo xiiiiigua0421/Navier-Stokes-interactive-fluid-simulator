@@ -1,0 +1,24 @@
+Connection: close
+Content-Length: 318
+Server: GitHub.com
+Content-Type: image/vnd.microsoft.icon
+Last-Modified: Sun, 01 Mar 2026 12:13:45 GMT
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31556952
+ETag: "69a42d79-13e"
+expires: Mon, 28 Sep 2026 16:13:48 GMT
+Cache-Control: max-age=600
+x-proxy-cache: MISS
+X-GitHub-Request-Id: 2516:3D81B2:C15E7:C9239:6ABA8FE3
+x-github-edge-region: southeastasia
+Accept-Ranges: bytes
+Age: 0
+Date: Mon, 28 Sep 2026 16:33:34 GMT
+Via: 1.1 varnish
+X-Served-By: cache-sin-wsat1880058-SIN
+X-Cache: HIT
+X-Cache-Hits: 0
+X-Timer: S1790613214.144892,VS0,VE253
+Vary: Accept-Encoding
+X-Fastly-Request-ID: 41385625238656cfd81f0b71eafe0bc208655a03
+

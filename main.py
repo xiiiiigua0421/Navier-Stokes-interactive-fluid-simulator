@@ -42,7 +42,9 @@
 染料色階固定為 0～1。
 """
 
+import asyncio
 import math
+from pathlib import Path
 
 import numpy as np
 import pygame
@@ -71,6 +73,7 @@ DIVERGENCE_FPS = 6.0
 BOAT_SPEEDS = (120.0, 180.0, 270.0, 400.0, 600.0, 900.0, 1350.0, 2000.0)
 BOAT_TURN_SPEED = math.pi
 BOAT_START = (VIEW_PIXELS * 0.35, VIEW_PIXELS * 0.5)
+FONT_PATH = Path(__file__).with_name("assets") / "NotoSansTC-VF.ttf"
 
 WINDOW_SIZE = (VIEW_PIXELS + PANEL_PIXELS, VIEW_PIXELS)
 
@@ -402,12 +405,12 @@ def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
         screen.blit(label_font.render(label, True, color), (panel_x + 20, y))
 
 
-def main():
+async def main():
     pygame.init()
     screen = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Navier–Stokes 流體模擬")
-    font = pygame.font.SysFont("Microsoft JhengHei", 24)
-    small_font = pygame.font.SysFont("Microsoft JhengHei", 18)
+    font = pygame.font.Font(str(FONT_PATH), 24)
+    small_font = pygame.font.Font(str(FONT_PATH), 18)
     clock = pygame.time.Clock()
     resolution_index = RESOLUTIONS.index(DEFAULT_RESOLUTION)
     initial_state = DEFAULT_INITIAL_STATE
@@ -533,7 +536,9 @@ def main():
                 )
 
         rgb, color_scale = fluid.colors(color_mode)
-        pixels = pygame.surfarray.make_surface(np.transpose(rgb, (1, 0, 2)))
+        pixels = pygame.image.frombuffer(
+            np.ascontiguousarray(rgb).tobytes(), (fluid.n, fluid.n), "RGB"
+        )
         screen.blit(pygame.transform.scale(pixels, (VIEW_PIXELS, VIEW_PIXELS)),
                     (0, 0))
         draw_arrows(screen, fluid, arrow_mode)
@@ -542,9 +547,10 @@ def main():
                    color_scale, BOAT_SPEEDS[boat_speed_index], paused,
                    clock.get_fps())
         pygame.display.flip()
+        await asyncio.sleep(0)
 
     pygame.quit()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

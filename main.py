@@ -11,6 +11,7 @@
     流體顯示區固定 768×768 像素，右側是 320 像素的資訊面板。
     [ / ]：切換 32、64、128、192 的方形模擬網格；視窗大小不變，
            切換時重新建立流場。DEFAULT_RESOLUTION 設定起始解析度。
+    H：切換一般放大與 768×768 色彩插值顯示；不改變模擬網格。
     C：循環切換顏色代表的速度大小、相對壓力、渦度、染料濃度。
     X：循環切換箭頭代表的速度、壓力力 -∇p、染料濃度梯度或不顯示。
     I：切換兩種初始流場並重設；R：重設目前選擇的初始流場。
@@ -369,7 +370,7 @@ def draw_boat(screen, x, y, heading_x, heading_y):
 
 
 def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
-               color_scale, boat_speed, paused, fps):
+               color_scale, boat_speed, smooth_upscale, paused, fps):
     panel_x = VIEW_PIXELS
     pygame.draw.rect(screen, (0, 0, 0),
                      (panel_x, 0, PANEL_PIXELS, VIEW_PIXELS))
@@ -396,6 +397,8 @@ def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
         ("I：切換初始狀態", small_font, (215, 221, 233), 546),
         ("R：重設 / 空白鍵：暫停", small_font, (215, 221, 233), 570),
         ("Esc：離開", small_font, (215, 221, 233), 594),
+        (f"H：色彩插值 {'開' if smooth_upscale else '關'}", small_font,
+         (215, 221, 233), 618),
         (f"散度 RMS {fluid.divergence_rms:.2e}", small_font,
          (152, 230, 190), 648),
         (f"{fps:.0f} FPS  |  {'暫停' if paused else '運行'}", small_font,
@@ -417,6 +420,7 @@ async def main():
     fluid = Fluid(RESOLUTIONS[resolution_index], initial_state)
     color_mode = 0
     arrow_mode = 0
+    smooth_upscale = False
     paused = False
     boat_x, boat_y = BOAT_START
     boat_heading_x, boat_heading_y = 0.0, -1.0
@@ -437,6 +441,8 @@ async def main():
                     color_mode = (color_mode + 1) % len(COLOR_MODES)
                 elif event.key == pygame.K_x:
                     arrow_mode = (arrow_mode + 1) % len(ARROW_MODES)
+                elif event.key == pygame.K_h:
+                    smooth_upscale = not smooth_upscale
                 elif event.key == pygame.K_SPACE:
                     paused = not paused
                 elif event.key in (pygame.K_PLUS, pygame.K_EQUALS,
@@ -539,13 +545,14 @@ async def main():
         pixels = pygame.image.frombuffer(
             np.ascontiguousarray(rgb).tobytes(), (fluid.n, fluid.n), "RGB"
         )
-        screen.blit(pygame.transform.scale(pixels, (VIEW_PIXELS, VIEW_PIXELS)),
-                    (0, 0))
+        scaler = (pygame.transform.smoothscale if smooth_upscale
+                  else pygame.transform.scale)
+        screen.blit(scaler(pixels, (VIEW_PIXELS, VIEW_PIXELS)), (0, 0))
         draw_arrows(screen, fluid, arrow_mode)
         draw_boat(screen, boat_x, boat_y, boat_heading_x, boat_heading_y)
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
-                   color_scale, BOAT_SPEEDS[boat_speed_index], paused,
-                   clock.get_fps())
+                   color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
+                   paused, clock.get_fps())
         pygame.display.flip()
         await asyncio.sleep(0)
 

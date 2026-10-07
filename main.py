@@ -402,7 +402,7 @@ def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
         (f"散度 RMS {fluid.divergence_rms:.2e}", small_font,
          (152, 230, 190), 648),
         (f"{fps:.0f} FPS  |  {'暫停' if paused else '運行'}", small_font,
-         (152, 230, 190), 680),
+         (255, 140, 140) if paused else (152, 230, 190), 680),
     )
     for label, label_font, color, y in lines:
         screen.blit(label_font.render(label, True, color), (panel_x + 20, y))
@@ -414,6 +414,7 @@ async def main():
     pygame.display.set_caption("Navier–Stokes 流體模擬")
     font = pygame.font.Font(str(FONT_PATH), 24)
     small_font = pygame.font.Font(str(FONT_PATH), 18)
+    large_font = pygame.font.Font(str(FONT_PATH), 64)
     clock = pygame.time.Clock()
     resolution_index = RESOLUTIONS.index(DEFAULT_RESOLUTION)
     initial_state = DEFAULT_INITIAL_STATE
@@ -553,6 +554,17 @@ async def main():
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())
+
+        if paused:
+            overlay = pygame.Surface((VIEW_PIXELS, VIEW_PIXELS))
+            overlay.set_alpha(128)
+            overlay.fill((0, 0, 0))
+            screen.blit(overlay, (0, 0))
+
+            paused_text = large_font.render("已暫停 PAUSED", True, (255, 255, 255))
+            text_rect = paused_text.get_rect(center=(VIEW_PIXELS / 2, VIEW_PIXELS / 2))
+            screen.blit(paused_text, text_rect)
+
         pygame.display.flip()
         await asyncio.sleep(0)
 

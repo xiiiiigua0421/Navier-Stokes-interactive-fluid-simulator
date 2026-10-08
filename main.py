@@ -553,6 +553,15 @@ async def main():
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())
+
+        mouse_pos = pygame.mouse.get_pos()
+        if pygame.mouse.get_focused() and mouse_pos[0] < VIEW_PIXELS:
+            pygame.mouse.set_visible(False)
+            brush_pixels = max(1, round(BRUSH_RADIUS * VIEW_PIXELS / DEFAULT_RESOLUTION))
+            pygame.draw.circle(screen, (255, 255, 255), mouse_pos, brush_pixels, 1)
+        else:
+            pygame.mouse.set_visible(True)
+
         pygame.display.flip()
         await asyncio.sleep(0)
 

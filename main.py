@@ -370,7 +370,7 @@ def draw_boat(screen, x, y, heading_x, heading_y):
 
 
 def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
-               color_scale, boat_speed, smooth_upscale, paused, fps):
+               color_scale, boat_speed, smooth_upscale, paused, fps, current_hue):
     panel_x = VIEW_PIXELS
     pygame.draw.rect(screen, (0, 0, 0),
                      (panel_x, 0, PANEL_PIXELS, VIEW_PIXELS))
@@ -401,11 +401,20 @@ def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
          (215, 221, 233), 618),
         (f"散度 RMS {fluid.divergence_rms:.2e}", small_font,
          (152, 230, 190), 648),
-        (f"{fps:.0f} FPS  |  {'暫停' if paused else '運行'}", small_font,
-         (152, 230, 190), 680),
+        (f"{fps:.0f} FPS", small_font, (152, 230, 190), 676),
+        ("⏸ 暫停 (空白鍵繼續)" if paused else "▶ 運行", small_font,
+         (250, 190, 110) if paused else (152, 230, 190), 704),
     )
     for label, label_font, color, y in lines:
         screen.blit(label_font.render(label, True, color), (panel_x + 20, y))
+
+    if color_mode == 3:
+        ramp = ((239, 172, 202), (248, 196, 169), (246, 224, 166),
+                (172, 223, 198), (190, 189, 240))
+        brush_rgb = tuple(palette(np.array([current_hue]), ramp)[0])
+        indicator_y = 163
+        pygame.draw.circle(screen, brush_rgb, (panel_x + 130, indicator_y), 8)
+        pygame.draw.circle(screen, (255, 255, 255), (panel_x + 130, indicator_y), 8, 1)
 
 
 async def main():
@@ -552,7 +561,7 @@ async def main():
         draw_boat(screen, boat_x, boat_y, boat_heading_x, boat_heading_y)
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
-                   paused, clock.get_fps())
+                   paused, clock.get_fps(), current_brush_hue())
         pygame.display.flip()
         await asyncio.sleep(0)
 

@@ -1,0 +1,3 @@
+## 2023-10-09 - Pygame UI State Visibility
+**Learning:** In headless or complex interactive Pygame simulations, users often miss critical state changes (like "paused" vs "running") if they are grouped with high-frequency dynamic text (like FPS). Additionally, continuous visual state variables (like brush hue) are frustrating if hidden until interacted with.
+**Action:** Separate critical state text from fast-updating diagnostics. Use standard Unicode symbols and distinct colors to draw attention to actionable states. Always provide a persistent visual indicator for continuous variables before user interaction is required.

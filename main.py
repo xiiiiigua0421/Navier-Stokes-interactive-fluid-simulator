@@ -402,7 +402,7 @@ def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
         (f"散度 RMS {fluid.divergence_rms:.2e}", small_font,
          (152, 230, 190), 648),
         (f"{fps:.0f} FPS  |  {'暫停' if paused else '運行'}", small_font,
-         (152, 230, 190), 680),
+         (255, 128, 128) if paused else (152, 230, 190), 680),
     )
     for label, label_font, color, y in lines:
         screen.blit(label_font.render(label, True, color), (panel_x + 20, y))
@@ -550,6 +550,20 @@ async def main():
         screen.blit(scaler(pixels, (VIEW_PIXELS, VIEW_PIXELS)), (0, 0))
         draw_arrows(screen, fluid, arrow_mode)
         draw_boat(screen, boat_x, boat_y, boat_heading_x, boat_heading_y)
+
+        if paused:
+            overlay = pygame.Surface((VIEW_PIXELS, VIEW_PIXELS), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 128))
+
+            # Draw pause icon (two vertical bars)
+            icon_w, icon_h = 40, 120
+            gap = 30
+            center_x, center_y = VIEW_PIXELS // 2, VIEW_PIXELS // 2
+            pygame.draw.rect(overlay, (255, 255, 255, 200), (center_x - icon_w - gap//2, center_y - icon_h//2, icon_w, icon_h), border_radius=10)
+            pygame.draw.rect(overlay, (255, 255, 255, 200), (center_x + gap//2, center_y - icon_h//2, icon_w, icon_h), border_radius=10)
+
+            screen.blit(overlay, (0, 0))
+
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())

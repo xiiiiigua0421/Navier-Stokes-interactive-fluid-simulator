@@ -550,6 +550,13 @@ async def main():
         screen.blit(scaler(pixels, (VIEW_PIXELS, VIEW_PIXELS)), (0, 0))
         draw_arrows(screen, fluid, arrow_mode)
         draw_boat(screen, boat_x, boat_y, boat_heading_x, boat_heading_y)
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if mouse_x < VIEW_PIXELS:
+            brush_r = int(BRUSH_RADIUS * VIEW_PIXELS / DEFAULT_RESOLUTION * 1.5)
+            pygame.draw.circle(screen, (0, 0, 0), (mouse_x, mouse_y), brush_r + 1, 1)
+            pygame.draw.circle(screen, (255, 255, 255), (mouse_x, mouse_y), brush_r, 1)
+
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())

@@ -550,6 +550,23 @@ async def main():
         screen.blit(scaler(pixels, (VIEW_PIXELS, VIEW_PIXELS)), (0, 0))
         draw_arrows(screen, fluid, arrow_mode)
         draw_boat(screen, boat_x, boat_y, boat_heading_x, boat_heading_y)
+
+        # 🎨 Palette UX: Add visible brush cursor when hovering over canvas
+        mouse_pos = pygame.mouse.get_pos()
+        if mouse_pos[0] < VIEW_PIXELS and not paused:
+            radius = int(BRUSH_RADIUS * VIEW_PIXELS / fluid.n)
+            pygame.draw.circle(screen, (255, 255, 255), mouse_pos, radius, 1)
+            pygame.draw.circle(screen, (0, 0, 0), mouse_pos, radius + 1, 1)
+
+        # 🎨 Palette UX: Add distinct visual feedback for paused state
+        if paused:
+            overlay = pygame.Surface((VIEW_PIXELS, VIEW_PIXELS), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 100))
+            screen.blit(overlay, (0, 0))
+            pause_surf = font.render("暫 停", True, (255, 255, 255))
+            screen.blit(pause_surf, (VIEW_PIXELS // 2 - pause_surf.get_width() // 2,
+                                     VIEW_PIXELS // 2 - pause_surf.get_height() // 2))
+
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())

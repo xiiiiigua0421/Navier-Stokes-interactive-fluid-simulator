@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing direct manipulation feedback and state visibility
+**Learning:** Pygame applications often rely on tiny UI text elements (like "暫停" in a side panel) to convey global states. This forces users to shift their gaze away from the primary interaction area (the canvas), disrupting flow. Furthermore, invisible brushes make precise direct manipulation impossible.
+**Action:** Always provide in-context state indicators (like a dimming overlay for "Paused" state) directly on the canvas. Add a visible cursor/brush outline that scales with zoom/resolution to give users immediate, continuous feedback on the area of effect.

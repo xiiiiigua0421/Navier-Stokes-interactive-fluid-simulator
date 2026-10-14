@@ -82,6 +82,9 @@ COLOR_MODES = ("速度大小", "相對壓力", "渦度", "染料濃度")
 ARROW_MODES = ("速度方向", "壓力力方向", "染料梯度", "關閉")
 INITIAL_STATES = ("泰勒–格林 + 微擾", "柏林噪聲渦流")
 
+DYE_RAMP = ((239, 172, 202), (248, 196, 169), (246, 224, 166),
+            (172, 223, 198), (190, 189, 240))
+
 
 def palette(values, colors):
     """Map values in [0, 1] through a short RGB color ramp."""
@@ -293,9 +296,7 @@ class Fluid:
             return palette(0.5 + 0.5 * curl / scale, ramp), f"±{scale:.2f} /秒"
         hue = np.divide(self.dye_hue_mass, self.dye,
                         out=np.full_like(self.dye, 0.5), where=self.dye > 1e-8)
-        ramp = ((239, 172, 202), (248, 196, 169), (246, 224, 166),
-                (172, 223, 198), (190, 189, 240))
-        pigment = palette(hue, ramp)
+        pigment = palette(hue, DYE_RAMP)
         opacity = np.clip(self.dye * 1.8, 0.0, 1.0)
         rgb = opacity[..., None] * pigment
         return rgb.astype(np.uint8), "0 ~ 1"
@@ -553,6 +554,18 @@ async def main():
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())
+
+        if pygame.mouse.get_focused():
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            if mouse_x < VIEW_PIXELS:
+                brush_pixels = int(BRUSH_RADIUS * VIEW_PIXELS / DEFAULT_RESOLUTION)
+                hue = current_brush_hue()
+                color_array = palette(np.array([hue]), DYE_RAMP)[0]
+                color = (int(color_array[0]), int(color_array[1]), int(color_array[2]))
+                pygame.draw.circle(screen, (255, 255, 255), (mouse_x, mouse_y), brush_pixels, 1)
+                pygame.draw.circle(screen, color, (mouse_x, mouse_y), brush_pixels - 1, 1)
+                pygame.draw.circle(screen, (0, 0, 0), (mouse_x, mouse_y), brush_pixels + 1, 1)
+
         pygame.display.flip()
         await asyncio.sleep(0)
 

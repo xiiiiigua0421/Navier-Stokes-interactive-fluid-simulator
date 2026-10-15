@@ -279,18 +279,18 @@ class Fluid:
             scale = max(float(np.percentile(speed, 98)), 1.0)
             ramp = ((0, 0, 0), (177, 186, 200), (161, 187, 221),
                     (160, 214, 219), (239, 191, 205))
-            return palette(speed / scale, ramp), f"0 ~ {scale:.1f} 格/秒"
+            return palette(speed / scale, ramp), f"0 ~ {scale:.1f} 格/秒", ramp
         if mode == 1:
             scale = max(float(np.percentile(np.abs(self.pressure), 98)), 0.1)
             ramp = ((153, 179, 225), (175, 189, 215), (0, 0, 0),
                     (219, 179, 190), (242, 166, 180))
-            return palette(0.5 + 0.5 * self.pressure / scale, ramp), f"±{scale:.2f}"
+            return palette(0.5 + 0.5 * self.pressure / scale, ramp), f"±{scale:.2f}", ramp
         if mode == 2:
             curl = self.vorticity()
             scale = max(float(np.percentile(np.abs(curl), 98)), 0.05)
             ramp = ((158, 211, 219), (176, 202, 211), (0, 0, 0),
                     (207, 177, 206), (228, 165, 207))
-            return palette(0.5 + 0.5 * curl / scale, ramp), f"±{scale:.2f} /秒"
+            return palette(0.5 + 0.5 * curl / scale, ramp), f"±{scale:.2f} /秒", ramp
         hue = np.divide(self.dye_hue_mass, self.dye,
                         out=np.full_like(self.dye, 0.5), where=self.dye > 1e-8)
         ramp = ((239, 172, 202), (248, 196, 169), (246, 224, 166),
@@ -298,7 +298,7 @@ class Fluid:
         pigment = palette(hue, ramp)
         opacity = np.clip(self.dye * 1.8, 0.0, 1.0)
         rgb = opacity[..., None] * pigment
-        return rgb.astype(np.uint8), "0 ~ 1"
+        return rgb.astype(np.uint8), "0 ~ 1", ramp
 
     def arrow_field(self, mode):
         if mode == 0:
@@ -370,7 +370,7 @@ def draw_boat(screen, x, y, heading_x, heading_y):
 
 
 def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
-               color_scale, boat_speed, smooth_upscale, paused, fps):
+               color_scale, ramp, boat_speed, smooth_upscale, paused, fps):
     panel_x = VIEW_PIXELS
     pygame.draw.rect(screen, (0, 0, 0),
                      (panel_x, 0, PANEL_PIXELS, VIEW_PIXELS))
@@ -406,6 +406,14 @@ def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
     )
     for label, label_font, color, y in lines:
         screen.blit(label_font.render(label, True, color), (panel_x + 20, y))
+
+    gradient = np.linspace(0.0, 1.0, 200)
+    rgb_line = palette(gradient, ramp)
+    rgb_bar = np.tile(rgb_line, (8, 1, 1))
+    bar_surf = pygame.image.frombuffer(
+        np.ascontiguousarray(rgb_bar).tobytes(), (200, 8), "RGB"
+    )
+    screen.blit(bar_surf, (panel_x + 20, 214))
 
 
 async def main():
@@ -541,7 +549,7 @@ async def main():
                     (now - last_divergence_update) // divergence_interval
                 )
 
-        rgb, color_scale = fluid.colors(color_mode)
+        rgb, color_scale, ramp = fluid.colors(color_mode)
         pixels = pygame.image.frombuffer(
             np.ascontiguousarray(rgb).tobytes(), (fluid.n, fluid.n), "RGB"
         )
@@ -551,7 +559,7 @@ async def main():
         draw_arrows(screen, fluid, arrow_mode)
         draw_boat(screen, boat_x, boat_y, boat_heading_x, boat_heading_y)
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
-                   color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
+                   color_scale, ramp, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())
         pygame.display.flip()
         await asyncio.sleep(0)

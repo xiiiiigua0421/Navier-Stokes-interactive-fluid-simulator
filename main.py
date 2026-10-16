@@ -395,14 +395,14 @@ def draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
         ("右鍵拖曳：只染色", small_font, (215, 221, 233), 494),
         ("[ / ]：解析度 (切換會重設)", small_font, (215, 221, 233), 522),
         ("I：切換初始狀態", small_font, (215, 221, 233), 546),
-        ("R：重設 / 空白鍵：暫停", small_font, (215, 221, 233), 570),
+        (f"R：重設 / 空白鍵：{'繼續' if paused else '暫停'}", small_font, (215, 221, 233), 570),
         ("Esc：離開", small_font, (215, 221, 233), 594),
         (f"H：色彩插值 {'開' if smooth_upscale else '關'}", small_font,
          (215, 221, 233), 618),
         (f"散度 RMS {fluid.divergence_rms:.2e}", small_font,
          (152, 230, 190), 648),
         (f"{fps:.0f} FPS  |  {'暫停' if paused else '運行'}", small_font,
-         (152, 230, 190), 680),
+         (240, 180, 150) if paused else (152, 230, 190), 680),
     )
     for label, label_font, color, y in lines:
         screen.blit(label_font.render(label, True, color), (panel_x + 20, y))

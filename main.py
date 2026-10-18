@@ -428,6 +428,7 @@ async def main():
     elapsed = 0.0
     last_divergence_update = pygame.time.get_ticks()
     running = True
+    current_cursor = None
 
     while running:
         frame_seconds = min(clock.tick(60) / 1000.0, 0.25)
@@ -553,6 +554,16 @@ async def main():
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())
+
+        mouse_x, _ = pygame.mouse.get_pos()
+        target_cursor = pygame.SYSTEM_CURSOR_CROSSHAIR if mouse_x < VIEW_PIXELS else pygame.SYSTEM_CURSOR_ARROW
+        if target_cursor != current_cursor:
+            try:
+                pygame.mouse.set_cursor(target_cursor)
+            except pygame.error:
+                pass
+            current_cursor = target_cursor
+
         pygame.display.flip()
         await asyncio.sleep(0)
 

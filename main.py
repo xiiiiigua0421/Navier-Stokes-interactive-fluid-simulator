@@ -428,6 +428,7 @@ async def main():
     elapsed = 0.0
     last_divergence_update = pygame.time.get_ticks()
     running = True
+    in_view_area = False
 
     while running:
         frame_seconds = min(clock.tick(60) / 1000.0, 0.25)
@@ -487,6 +488,17 @@ async def main():
                                  event.rel[0] * fluid.n / VIEW_PIXELS,
                                  event.rel[1] * fluid.n / VIEW_PIXELS,
                                  bool(event.buttons[0]), current_brush_hue())
+
+                was_in_view = in_view_area
+                in_view_area = event.pos[0] < VIEW_PIXELS
+                if in_view_area != was_in_view:
+                    try:
+                        if in_view_area:
+                            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+                        else:
+                            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                    except pygame.error:
+                        pass
 
         if not paused:
             keys = pygame.key.get_pressed()
@@ -553,6 +565,15 @@ async def main():
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())
+
+        # Draw brush cursor outline if mouse is in view area
+        if in_view_area:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            if mouse_x < VIEW_PIXELS:
+                brush_radius_px = int(BRUSH_RADIUS * VIEW_PIXELS / DEFAULT_RESOLUTION)
+                pygame.draw.circle(screen, (0, 0, 0), (mouse_x, mouse_y), brush_radius_px, 2)
+                pygame.draw.circle(screen, (255, 255, 255), (mouse_x, mouse_y), brush_radius_px, 1)
+
         pygame.display.flip()
         await asyncio.sleep(0)
 

@@ -1,0 +1,3 @@
+## 2025-02-23 - Context-Sensitive Cursor Affordance in Pygame
+**Learning:** Pygame provides limited built-in UI components, so canvas interactions (like drawing or injecting fluid) can feel unintuitive without explicit visual cues. Changing the cursor dynamically based on mouse position (e.g., crosshair over the canvas, arrow over side panels) immediately provides the missing affordance.
+**Action:** When working on custom interactive canvases or games where the user interacts by clicking/dragging, dynamically update `pygame.mouse.set_cursor` to provide clear interaction zones. Wrap cursor calls in `try/except pygame.error` to avoid crashes in headless/CI test environments.

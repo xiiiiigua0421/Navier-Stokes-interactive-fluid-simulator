@@ -1,0 +1,3 @@
+## 2024-05-24 - Contextual Cursors in Pygame
+**Learning:** Pygame provides system cursors (like `SYSTEM_CURSOR_CROSSHAIR`), which are excellent for indicating interactive areas like drawing canvases. However, when running in headless environments (like tests with `SDL_VIDEODRIVER=dummy`), attempting to set these cursors raises a `pygame.error`.
+**Action:** When implementing contextual cursors in Pygame applications, always wrap the `pygame.mouse.set_cursor` calls in a `try/except pygame.error` block to prevent crashes in headless environments. Also, only update the cursor when the state actually changes (e.g., crossing the boundary between an interactive and non-interactive area) to avoid unnecessary overhead in the main event loop.

@@ -427,6 +427,11 @@ async def main():
     boat_speed_index = 1
     elapsed = 0.0
     last_divergence_update = pygame.time.get_ticks()
+    is_crosshair = False
+    try:
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+    except pygame.error:
+        pass
     running = True
 
     while running:
@@ -481,6 +486,16 @@ async def main():
                                  event.pos[1] * fluid.n / VIEW_PIXELS,
                                  0.0, 0.0, False, current_brush_hue())
             elif event.type == pygame.MOUSEMOTION:
+                in_view = event.pos[0] < VIEW_PIXELS
+                if in_view != is_crosshair:
+                    is_crosshair = in_view
+                    try:
+                        if is_crosshair:
+                            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+                        else:
+                            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                    except pygame.error:
+                        pass
                 if event.pos[0] < VIEW_PIXELS and (event.buttons[0] or event.buttons[2]):
                     fluid.inject(event.pos[0] * fluid.n / VIEW_PIXELS,
                                  event.pos[1] * fluid.n / VIEW_PIXELS,

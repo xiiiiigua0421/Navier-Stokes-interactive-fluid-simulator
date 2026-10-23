@@ -488,6 +488,16 @@ async def main():
                                  event.rel[1] * fluid.n / VIEW_PIXELS,
                                  bool(event.buttons[0]), current_brush_hue())
 
+        if pygame.mouse.get_focused():
+            mouse_x, _ = pygame.mouse.get_pos()
+            try:
+                if mouse_x < VIEW_PIXELS:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+                else:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            except pygame.error:
+                pass
+
         if not paused:
             keys = pygame.key.get_pressed()
             forward = keys[pygame.K_w] or keys[pygame.K_UP]

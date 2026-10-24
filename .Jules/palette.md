@@ -1,0 +1,3 @@
+## 2024-05-19 - Context-sensitive cursors in Pygame
+**Learning:** Using different mouse cursors in Pygame (like `SYSTEM_CURSOR_CROSSHAIR`) effectively indicates interactive drawing areas versus non-interactive control panels. However, setting the system cursor can fail and crash the application when running in headless environments (e.g. CI/CD or automated testing with `SDL_VIDEODRIVER=dummy`).
+**Action:** Always wrap `pygame.mouse.set_cursor` calls in a `try/except pygame.error` block to safely handle environments where cursors cannot be initialized, preventing test crashes while preserving the UX enhancement for real users.

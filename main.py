@@ -481,6 +481,14 @@ async def main():
                                  event.pos[1] * fluid.n / VIEW_PIXELS,
                                  0.0, 0.0, False, current_brush_hue())
             elif event.type == pygame.MOUSEMOTION:
+                try:
+                    if event.pos[0] < VIEW_PIXELS:
+                        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+                    else:
+                        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                except pygame.error:
+                    pass
+
                 if event.pos[0] < VIEW_PIXELS and (event.buttons[0] or event.buttons[2]):
                     fluid.inject(event.pos[0] * fluid.n / VIEW_PIXELS,
                                  event.pos[1] * fluid.n / VIEW_PIXELS,

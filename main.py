@@ -427,10 +427,23 @@ async def main():
     boat_speed_index = 1
     elapsed = 0.0
     last_divergence_update = pygame.time.get_ticks()
+    cursor_over_fluid = None
     running = True
 
     while running:
         frame_seconds = min(clock.tick(60) / 1000.0, 0.25)
+        mouse_x, _ = pygame.mouse.get_pos()
+        is_over_fluid = mouse_x < VIEW_PIXELS
+        if is_over_fluid != cursor_over_fluid:
+            cursor_over_fluid = is_over_fluid
+            try:
+                if is_over_fluid:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+                else:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            except pygame.error:
+                pass
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

@@ -1,0 +1,3 @@
+## 2024-11-01 - [Contextual Cursors in Pygame]
+**Learning:** Pygame supports system cursors, and dynamically changing them based on screen region (e.g., crosshair for a simulation area, arrow for UI panel) helps provide immediate visual feedback about what interactions are possible in different zones. Wrapping cursor changes in a `try/except pygame.error` is necessary to prevent crashes during headless testing.
+**Action:** Use contextual system cursors to reinforce interaction affordances in distinct UI zones, ensuring robust error handling for environments lacking a window manager.

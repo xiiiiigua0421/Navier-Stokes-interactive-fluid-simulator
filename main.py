@@ -431,6 +431,16 @@ async def main():
 
     while running:
         frame_seconds = min(clock.tick(60) / 1000.0, 0.25)
+
+        try:
+            mx, my = pygame.mouse.get_pos()
+            if mx < VIEW_PIXELS:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        except pygame.error:
+            pass
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

@@ -1,0 +1,3 @@
+## 2024-11-04 - Dynamic Contextual Cursor for Fluid Simulation View
+**Learning:** Pygame's system cursors (e.g., crosshair, arrow) can be dynamically toggled based on pointer position to provide clear boundaries for interactive areas in a canvas vs. settings panel application, but switching cursors can sometimes throw a `pygame.error` on headless systems or platforms without full cursor support.
+**Action:** When implementing Pygame cursor switching, cache the cursor state to prevent redundant setting calls per frame, and always wrap the `set_cursor` call in a `try/except pygame.error` to ensure the application remains stable.

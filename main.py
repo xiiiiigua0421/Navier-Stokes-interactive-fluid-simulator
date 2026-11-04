@@ -428,8 +428,18 @@ async def main():
     elapsed = 0.0
     last_divergence_update = pygame.time.get_ticks()
     running = True
+    current_cursor = None
 
     while running:
+        mouse_pos = pygame.mouse.get_pos()
+        desired_cursor = pygame.SYSTEM_CURSOR_CROSSHAIR if mouse_pos[0] < VIEW_PIXELS else pygame.SYSTEM_CURSOR_ARROW
+        if desired_cursor != current_cursor:
+            try:
+                pygame.mouse.set_cursor(desired_cursor)
+                current_cursor = desired_cursor
+            except pygame.error:
+                pass
+
         frame_seconds = min(clock.tick(60) / 1000.0, 0.25)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

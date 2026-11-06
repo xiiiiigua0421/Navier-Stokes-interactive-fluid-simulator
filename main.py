@@ -553,6 +553,17 @@ async def main():
         draw_panel(screen, font, small_font, fluid, color_mode, arrow_mode,
                    color_scale, BOAT_SPEEDS[boat_speed_index], smooth_upscale,
                    paused, clock.get_fps())
+
+        # Update cursor based on mouse position
+        mouse_pos = pygame.mouse.get_pos()
+        try:
+            if mouse_pos[0] < VIEW_PIXELS:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        except pygame.error:
+            pass
+
         pygame.display.flip()
         await asyncio.sleep(0)
 

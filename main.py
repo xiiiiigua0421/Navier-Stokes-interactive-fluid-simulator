@@ -422,6 +422,7 @@ async def main():
     arrow_mode = 0
     smooth_upscale = False
     paused = False
+    current_cursor = None
     boat_x, boat_y = BOAT_START
     boat_heading_x, boat_heading_y = 0.0, -1.0
     boat_speed_index = 1
@@ -487,6 +488,15 @@ async def main():
                                  event.rel[0] * fluid.n / VIEW_PIXELS,
                                  event.rel[1] * fluid.n / VIEW_PIXELS,
                                  bool(event.buttons[0]), current_brush_hue())
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        target_cursor = pygame.SYSTEM_CURSOR_CROSSHAIR if mouse_x < VIEW_PIXELS else pygame.SYSTEM_CURSOR_ARROW
+        if current_cursor != target_cursor:
+            try:
+                pygame.mouse.set_cursor(target_cursor)
+                current_cursor = target_cursor
+            except pygame.error:
+                pass
 
         if not paused:
             keys = pygame.key.get_pressed()
